@@ -1,0 +1,158 @@
+###### Stata code for mediation analyses in doi: XXX
+###### Authors: Virginia Carter Leno & Moritz Herle
+
+ff_I_cont = intercept fussy eaating
+ff_S_cont= 	slope fussy eating
+asd_I =		asd intercept
+asd_S =		asd slope 
+
+
+
+
+* LATENT ED FACTOR
+*program mediation_model, rclass				  
+ gsem (ff_I_cont -> asd_S, ) (ff_I_cont -> ff_S_cont, ) (ff_I_cont -> Y, ) ///
+ (asd_S -> Y, ) (asd_I -> asd_S, ) (asd_I -> ff_S_cont, ) (asd_I -> Y, ) ///
+ (ff_S_cont -> Y, ) (Y -> fast, family(bernoulli) link(logit)) ///
+ (Y -> binge, family(bernoulli) link(logit)) (Y -> purge, family(bernoulli) link(logit)) ///
+ (sex -> ff_I_cont, ) (sex -> asd_S, ) (sex -> asd_I, ) (sex -> ff_S_cont, ) ///
+ (sex -> Y, ) (prebmi -> ff_I_cont, ) (prebmi -> asd_S, ) (prebmi -> asd_I, ) ///
+ (prebmi -> ff_S_cont, ) (prebmi -> Y, ) (matagedelivery -> ff_I_cont, ) (matagedelivery -> asd_S, ) ///
+ (matagedelivery -> asd_I, ) (matagedelivery -> ff_S_cont, ) (matagedelivery -> Y, ) ///
+ (matedbin -> ff_I_cont, ) (matedbin -> asd_S, ) (matedbin -> asd_I, ) ///
+ (matedbin -> ff_S_cont, ) (matedbin -> Y, ), latent(Y ) cov( e.ff_I_cont*e.asd_I e.ff_S_cont*e.asd_S) nocapslatent
+
+*** bootstrap 
+** get the labels of coefficient. 
+gsem, coeflegend
+
+nlcom(ind: _b[ff_S_cont:asd_I]*_b[Y:ff_S_cont]) 
+return scalar ind=_b[ff_S_cont:asd_I]*_b[Y:ff_S_cont]
+end 
+
+bootstrap r(ind),  reps(2) seed(180718): mediation_model
+
+*** outcome: FASTING 
+  
+gsem (ff_I_cont -> ff_S_cont, ) (ff_I_cont -> fast, family(bernoulli) link(logit)) ///
+(asd_S -> fast, family(bernoulli) link(logit)) (asd_I -> asd_S, ) ///
+(asd_I -> ff_S_cont, ) (asd_I -> fast, family(bernoulli) link(logit)) ///
+(ff_S_cont -> fast, family(bernoulli) link(logit)) (sex -> ff_I_cont, ) ///
+ (sex -> asd_S, ) (sex -> asd_I, ) (sex -> ff_S_cont, ) ///
+ (sex -> fast, family(bernoulli) link(logit)) (prebmi-> ff_I_cont, ) /// 
+ (prebmi -> asd_S, ) (prebmi -> asd_I, ) (prebmi -> ff_S_cont, ) ///
+ (prebmi -> fast, family(bernoulli) link(logit)) (matagedelivery -> ff_I_cont, ) ///
+ (matagedelivery -> asd_S, ) (matagedelivery -> asd_I, ) (matagedelivery -> ff_S_cont, ) /// 
+ (matagedelivery -> fast, family(bernoulli) link(logit)) (matedbin -> ff_I_cont, ) ///
+ (matedbin -> asd_S, ) (matedbin -> asd_I, ) (matedbin -> ff_S_cont,  ) ///
+ (matedbin -> fast, family(bernoulli) link(logit)), ///
+ cov( e.ff_I_cont*e.asd_I e.ff_S_cont*e.asd_S) nocapslatent
+ 
+ gsem, coeflegend
+
+nlcom(ind: _b[ff_S_cont:asd_I]*_b[fast:ff_S_cont]) 
+ 
+ 
+  
+ *** outcome: BINGE EATING 
+ 
+ gsem (ff_I_cont -> ff_S_cont, ) (ff_I_cont -> binge, family(bernoulli) link(logit)) ///
+(asd_S -> binge, family(bernoulli) link(logit)) (asd_I -> asd_S, ) ///
+(asd_I -> ff_S_cont, ) (asd_I -> binge, family(bernoulli) link(logit)) ///
+(ff_S_cont -> binge, family(bernoulli) link(logit)) (sex -> ff_I_cont, ) ///
+ (sex -> asd_S, ) (sex -> asd_I, ) (sex -> ff_S_cont, ) ///
+ (sex -> binge, family(bernoulli) link(logit)) (prebmi-> ff_I_cont, ) /// 
+ (prebmi -> asd_S, ) (prebmi -> asd_I, ) (prebmi -> ff_S_cont, ) ///
+ (prebmi -> binge, family(bernoulli) link(logit)) (matagedelivery -> ff_I_cont, ) ///
+ (matagedelivery -> asd_S, ) (matagedelivery -> asd_I, ) (matagedelivery -> ff_S_cont, ) /// 
+ (matagedelivery -> binge, family(bernoulli) link(logit)) (matedbin -> ff_I_cont, ) ///
+ (matedbin -> asd_S, ) (matedbin -> asd_I, ) (matedbin -> ff_S_cont,  ) ///
+ (matedbin -> binge, family(bernoulli) link(logit)), ///
+ cov( e.ff_I_cont*e.asd_I e.ff_S_cont*e.asd_S) nocapslatent
+ 
+ nlcom(ind: _b[ff_S_cont:asd_I]*_b[binge:ff_S_cont]) 
+
+ 
+ 
+ **** outcome: PURGE
+ 
+ gsem (ff_I_cont -> ff_S_cont, ) (ff_I_cont -> purge, family(bernoulli) link(logit)) ///
+(asd_S -> purge, family(bernoulli) link(logit)) (asd_I -> asd_S, ) ///
+(asd_I -> ff_S_cont, ) (asd_I -> purge, family(bernoulli) link(logit)) ///
+(ff_S_cont -> purge, family(bernoulli) link(logit)) (sex -> ff_I_cont, ) ///
+ (sex -> asd_S, ) (sex -> asd_I, ) (sex -> ff_S_cont, ) ///
+ (sex -> purge, family(bernoulli) link(logit)) (prebmi-> ff_I_cont, ) /// 
+ (prebmi -> asd_S, ) (prebmi -> asd_I, ) (prebmi -> ff_S_cont, ) ///
+ (prebmi -> purge, family(bernoulli) link(logit)) (matagedelivery -> ff_I_cont, ) ///
+ (matagedelivery -> asd_S, ) (matagedelivery -> asd_I, ) (matagedelivery -> ff_S_cont, ) /// 
+ (matagedelivery -> purge, family(bernoulli) link(logit)) (matedbin -> ff_I_cont, ) ///
+ (matedbin -> asd_S, ) (matedbin -> asd_I, ) (matedbin -> ff_S_cont,  ) ///
+ (matedbin -> purge, family(bernoulli) link(logit)), ///
+ cov( e.ff_I_cont*e.asd_I e.ff_S_cont*e.asd_S) nocapslatent
+ 
+ 
+  nlcom(ind: _b[ff_S_cont:asd_I]*_b[purge:ff_S_cont]) 
+ 
+ 
+ 
+ ********* Sensitivity analyses 
+ ********* complete case only 
+ 
+ 
+
+* LATENT ED FACTOR, complete cases 
+*				  
+ gsem (I_FF_CC -> S_ASD_CC, ) (I_FF_CC -> S_FF_CC, ) (I_FF_CC -> Y, ) ///
+ (S_ASD_CC -> Y, ) (I_ASD_CC -> S_ASD_CC, ) (I_ASD_CC -> S_FF_CC, ) (I_ASD_CC -> Y, ) ///
+ (S_FF_CC -> Y, ) (Y -> fast, family(bernoulli) link(logit)) ///
+ (Y -> binge, family(bernoulli) link(logit)) (Y -> purge, family(bernoulli) link(logit)) ///
+ (sex -> I_FF_CC, ) (sex -> S_ASD_CC, ) (sex -> I_ASD_CC, ) (sex -> S_FF_CC, ) ///
+ (sex -> Y, ) (prebmi -> I_FF_CC, ) (prebmi -> S_ASD_CC, ) (prebmi -> I_ASD_CC, ) ///
+ (prebmi -> S_FF_CC, ) (prebmi -> Y, ) (matagedelivery -> I_FF_CC, ) (matagedelivery -> S_ASD_CC, ) ///
+ (matagedelivery -> I_ASD_CC, ) (matagedelivery -> S_FF_CC, ) (matagedelivery -> Y, ) ///
+ (matedbin -> I_FF_CC, ) (matedbin -> S_ASD_CC, ) (matedbin -> I_ASD_CC, ) ///
+ (matedbin -> S_FF_CC, ) (matedbin -> Y, ), latent(Y ) cov( e.I_FF_CC*e.I_ASD_CC e.S_FF_CC*e.S_ASD_CC) nocapslatent method(ml)
+
+ 
+ 
+* LATENT ED FACTOR
+* boys vs girls 				  
+ gsem (I_FF_CC -> S_ASD_CC, ) (I_FF_CC -> S_FF_CC, ) (I_FF_CC -> Y, ) ///
+ (S_ASD_CC -> Y, ) (I_ASD_CC -> S_ASD_CC, ) (I_ASD_CC -> S_FF_CC, ) (I_ASD_CC -> Y, ) ///
+ (S_FF_CC -> Y, ) (Y -> fast, family(bernoulli) link(logit)) ///
+ (Y -> binge, family(bernoulli) link(logit)) (Y -> purge, family(bernoulli) link(logit)) ///
+ (prebmi -> I_FF_CC, ) (prebmi -> S_ASD_CC, ) (prebmi -> I_ASD_CC, ) ///
+ (prebmi -> S_FF_CC, ) (prebmi -> Y, ) (matagedelivery -> I_FF_CC, ) (matagedelivery -> S_ASD_CC, ) ///
+ (matagedelivery -> I_ASD_CC, ) (matagedelivery -> S_FF_CC, ) (matagedelivery -> Y, ) ///
+ (matedbin -> I_FF_CC, ) (matedbin -> S_ASD_CC, ) (matedbin -> I_ASD_CC, ) ///
+ (matedbin -> S_FF_CC, ) (matedbin -> Y, ), latent(Y ) cov( e.I_FF_CC*e.I_ASD_CC e.S_FF_CC*e.S_ASD_CC) nocapslatent group(sex) ginvariant(none)
+
+ 
+ 
+ 
+ 
+ 
+ 
+ * LATENT ED FACTOR, complete cases analyes 
+*				  
+
+ 
+ 
+gen to_keep2= I_FF_CC<.& S_FF_CC<.& I_ASD_CC<. & S_ASD_CC<. &fast<. &binge<. &purge<. 
+ta to_keep2
+keep if to_keep2==1
+ 
+ 
+ * LATENT ED FACTOR, complete cases 
+*				  
+ gsem (I_FF_CC -> S_ASD_CC, ) (I_FF_CC -> S_FF_CC, ) (I_FF_CC -> Y, ) ///
+ (S_ASD_CC -> Y, ) (I_ASD_CC -> S_ASD_CC, ) (I_ASD_CC -> S_FF_CC, ) (I_ASD_CC -> Y, ) ///
+ (S_FF_CC -> Y, ) (Y -> fast, family(bernoulli) link(logit)) ///
+ (Y -> binge, family(bernoulli) link(logit)) (Y -> purge, family(bernoulli) link(logit)) ///
+ (sex -> I_FF_CC, ) (sex -> S_ASD_CC, ) (sex -> I_ASD_CC, ) (sex -> S_FF_CC, ) ///
+ (sex -> Y, ) (prebmi -> I_FF_CC, ) (prebmi -> S_ASD_CC, ) (prebmi -> I_ASD_CC, ) ///
+ (prebmi -> S_FF_CC, ) (prebmi -> Y, ) (matagedelivery -> I_FF_CC, ) (matagedelivery -> S_ASD_CC, ) ///
+ (matagedelivery -> I_ASD_CC, ) (matagedelivery -> S_FF_CC, ) (matagedelivery -> Y, ) ///
+ (matedbin -> I_FF_CC, ) (matedbin -> S_ASD_CC, ) (matedbin -> I_ASD_CC, ) ///
+ (matedbin -> S_FF_CC, ) (matedbin -> Y, ), latent(Y ) cov( e.I_FF_CC*e.I_ASD_CC e.S_FF_CC*e.S_ASD_CC) nocapslatent method(ml)
+ 
